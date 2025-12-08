@@ -14,16 +14,12 @@ class Box
     def check_box #Allows user to check what is in the box
         puts(@variable)
     end
-    
-    def self.create_box()
-        Box.new()
-    end
 end
 
 class Player
-    attr_reader :player_name, :symbol, :score
-    def initialize(player_name, symbol, score = 0) #player_type can be either Player1, Player2, or Computer
-        @player_name = player_name
+    attr_reader :name, :symbol, :score
+    def initialize(name, symbol, score = 0) #player_type can be either Player1, Player2, or Computer
+        @name = name
         @symbol = symbol
         @score = score
     end
@@ -40,12 +36,15 @@ class Player
     def reset_score()
         @score = 0
     end
+
 end
 
 class GameManager
+    @@game_box
     def initialize(player1 = Player.new("Player1", "X"), player2 = Player.new("Player2", "O"))
         @player1 = player1
         @player2 = player2
+        reset_board()
     end
     
     def add_point(player) #Adds point to player object
@@ -56,27 +55,160 @@ class GameManager
         @player1.reset_score()
         @player2.reset_score()
     end
+
+    def reset_board()
+        @@game_box = []
+        for i in 0...3
+            @@game_box.push([])
+            for j in 0...3
+                @@game_box[i].push(Box.new())
+            end
+        end
+    end
+
+    def game_box()
+        @@game_box
+    end
 end    
 
-
-
-def create_box()
-    return(Box.new())
+#Create a command to check the board state to see if anyone has won?
+def check_board_state(game_box, player_x, player_o) #Fix Later -- function is repetitive and can use optimization
+    check1 = check_rows(game_box)
+    p(check1)
+    check2 = check_columns(game_box)
+    p(check2)
+    check3 = check_diagonals(game_box)
+    p(check3)
+    
+    if check1 == "X" || check2 == "X" || check3 == "X"
+        call_winner(player_x)
+    elsif check1 == "O" || check2 == "O" || check3 == "O"
+        call_winner(player_o)
+    end
+    
+end
+#Helper functions------------------------------------------------------------
+#Calls the winner
+def call_winner(player)
+    player.add_point()
+    puts("#{player.name} Wins") 
 end
 
-#Creating a game box
-game_box = []
-for i in 0...3
-    game_box.push([])
-    for j in 0...3
-        game_box[i].push(create_box)
+def check_rows(game_box)
+    #Check Rows
+    for i in 0...3
+        x_count = 0
+        o_count = 0
+        empty_count = 0
+        for boxes in game_box[i]
+            box_variable = boxes.variable
+            if box_variable == "X"
+                x_count += 1
+                # puts("X")
+            elsif box_variable == "O"
+                o_count += 1
+                # puts("O")
+            else
+                # puts("Empty")
+            end
+        end
+        
+        if x_count == 3
+            return("X")
+        elsif o_count == 3
+            return("O")
+        else
+            return("None")
+        end
     end
 end
 
-output = game_box[2][2] #For texting purposes
+def check_columns(game_box)
+    #Check Columns
+    for j in 0...3
+        for i in 0...3
+            x_count = 0
+            o_count = 0
+            box_variable = game_box[j][i].variable
+            if box_variable == "X" 
+                x_count += 1
+                # puts("X")
+            elsif box_variable == "O" 
+                o_count += 1
+                # puts("O")
+            else
+                # puts("Empty")
+            end
+            
+            if x_count == 3
+                return("X")
+            elsif o_count == 3
+                return("O")
+            else
+                return("None")
+            end
+        end
+    end
+end
 
-player_1 = Player.new("Player1", "X")
-player_2 = Player.new("Player2", "O")
+def check_diagonals(game_box)
+    #Check Diagonals
+    x_count = 0
+    o_count = 0
+    for i in 0...3
+        box_variable = game_box[i][-i].variable
+        if box_variable == "X" 
+            x_count += 1
+            # puts("X")
+        elsif box_variable == "O" 
+            o_count += 1
+            # puts("O")
+        else
+            # puts("Empty")
+        end
+        
+    end
+    
+    if x_count == 3
+        return("X")
+    elsif o_count == 3
+        return("O")
+    else
+        return("None")
+    end
+    
+    x_count = 0
+    o_count = 0
+    for i in 0...3
+        box_variable = game_box[i][i].variable
+        if box_variable == "X"
+            x_count += 1
+            # puts("X")
+        elsif box_variable == "O" 
+            o_count += 1
+            # puts("O")
+        else
+            # puts("Empty")
+        end
+    end
+    
+    if x_count == 3
+        return("X")
+    elsif o_count == 3
+        return("O")
+    else
+        return("None")
+    end
+end
 
-player_1.play(output)
-output.check_box
+player_x = Player.new("Player1", "X") #Has to be either X or O in the second element
+player_o = Player.new("Player2", "O")
+new_game = GameManager.new(player_x, player_o)
+game_box = new_game.game_box
+
+player_o.play(game_box[1][0])
+player_o.play(game_box[1][1])
+player_o.play(game_box[1][2])
+
+check_board_state(game_box, player_x, player_o)
+
