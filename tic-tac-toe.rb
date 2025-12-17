@@ -80,9 +80,9 @@ def check_board_state(game_box, player_x, player_o) #Fix Later -- function is re
     check3 = check_diagonals(game_box)
     p(check3)
     
-    if check1 == "X" || check2 == "X" || check3 == "X"
+    if (check1 == "X") || (check2 == "X") || (check3 == "X")
         call_winner(player_x)
-    elsif check1 == "O" || check2 == "O" || check3 == "O"
+    elsif (check1 == "O") || (check2 == "O") || (check3 == "O")
         call_winner(player_o)
     end
     
@@ -117,36 +117,31 @@ def check_rows(game_box)
             return("X")
         elsif o_count == 3
             return("O")
-        else
-            return("None")
         end
     end
 end
 
 def check_columns(game_box)
-    #Check Columns
+    #Check Columns    
     for j in 0...3
+        x_count = 0
+        o_count = 0
+
         for i in 0...3
-            x_count = 0
-            o_count = 0
-            box_variable = game_box[j][i].variable
+            box_variable = game_box[i][j].variable
             if box_variable == "X" 
                 x_count += 1
                 # puts("X")
             elsif box_variable == "O" 
                 o_count += 1
                 # puts("O")
-            else
-                # puts("Empty")
             end
             
-            if x_count == 3
-                return("X")
-            elsif o_count == 3
-                return("O")
-            else
-                return("None")
-            end
+        end
+        if x_count == 3
+            return("X")
+        elsif o_count == 3
+            return("O")
         end
     end
 end
@@ -156,15 +151,13 @@ def check_diagonals(game_box)
     x_count = 0
     o_count = 0
     for i in 0...3
-        box_variable = game_box[i][-i].variable
+        box_variable = game_box[i][-1-i].variable
         if box_variable == "X" 
             x_count += 1
             # puts("X")
         elsif box_variable == "O" 
             o_count += 1
             # puts("O")
-        else
-            # puts("Empty")
         end
         
     end
@@ -173,8 +166,6 @@ def check_diagonals(game_box)
         return("X")
     elsif o_count == 3
         return("O")
-    else
-        return("None")
     end
     
     x_count = 0
@@ -196,8 +187,6 @@ def check_diagonals(game_box)
         return("X")
     elsif o_count == 3
         return("O")
-    else
-        return("None")
     end
 end
 
@@ -206,9 +195,21 @@ player_o = Player.new("Player2", "O")
 new_game = GameManager.new(player_x, player_o)
 game_box = new_game.game_box
 
-player_o.play(game_box[1][0])
 player_o.play(game_box[1][1])
+player_x.play(game_box[2][2])
+player_o.play(game_box[2][1])
+player_x.play(game_box[0][1])
+player_o.play(game_box[0][2])
+player_x.play(game_box[2][0])
 player_o.play(game_box[1][2])
+player_x.play(game_box[1][0])
+player_o.play(game_box[1][1])
 
 check_board_state(game_box, player_x, player_o)
+
+#Future Work---------------------------------------
+#Making it easier to type in tic tac toe values
+#Making it check boardstate with every input. Adds points to winning player. #Also resets board at a win or tie
+#Creating a turn based system
+#Clean Up repetitive code in the "check_board_state" function
 
